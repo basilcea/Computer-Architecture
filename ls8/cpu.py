@@ -10,7 +10,7 @@ class CPU:
         self.ram = [0] * 256
         self.reg = [0] * 8
         self.pc = 0
-        self.flag = 0
+        self.stackPointer = 8
         self.HALTED = False
     def load(self):
         """Load a program into memory."""
@@ -36,7 +36,7 @@ class CPU:
                     one_and_zeroes = split_instruction_line[0].strip()
 
                     # ignore blank lines / comment only lines
-                    if len(num) == 0:
+                    if len(one_and_zeroes) == 0:
                         continue
 
                     # set the number to an integer of base 2
@@ -84,7 +84,7 @@ class CPU:
     def ram_read(self , MAR):
         return self.ram[MAR]
 
-    def raw_write(self , MDR , MAR):
+    def raw_write(self , MAR , MDR):
         self.reg[MAR] = MDR
         
 
@@ -106,16 +106,21 @@ class CPU:
             operands = (IR & 0b11000000) >> 6
             if IR == HLT:
                 self.HALTED = True
-            elif IR == LDI
+            elif IR == LDI:
                 self.reg[operand_a] = operand_b
             elif IR == PRN:
                 print(self.reg[operand_a])
             elif IR == MUL:
                 self.alu("MUL", operand_a, operand_b)
             elif IR == PUSH:
-                pass
+                self.stackPointer -=1
+                address = self.reg[self.stackPointer]
+                self.raw_write(address) = operand_a
             elif IR == POP:
                 pass
+            else:
+                print(f"Unknown Instruction {IR:08b}")
+                sys.exit(1)
             self.pc += operands + 1
             
     

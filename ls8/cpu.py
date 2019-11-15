@@ -2,6 +2,39 @@
 
 import sys
 
+branchTable ={
+    HALT: halt_op,
+    PRINT: print_op,
+    ADD: add_op,
+    PUSH: push_op,
+    POP: pop_op,
+    CALL: call_op,
+    RET: ret_op
+}
+# create functions for each activity
+
+def halt_op ():
+    self.HALT = True
+def pop_op():
+    self.reg[operand_a] = self.ram_read(self.reg[self.sp])
+    self.reg[self.sp] += 1
+def push_op():
+    self.reg[self.sp] -= 1
+    value = self.reg[operand_a]
+    address = self.reg[self.sp]
+    self.raw_write(address, value)
+def prn_op():
+    print(self.reg[operand_a])
+def ldi_op():
+    self.reg[operand_a] = operand_b
+def mul_op():
+    self.alu("MUL", operand_a, operand_b)
+def call_op():
+    pass
+def ret_op():
+    pass
+
+
 class CPU:
     """Main CPU class."""
 
@@ -10,7 +43,7 @@ class CPU:
         self.ram = [0] * 256
         self.reg = [0] * 8
         self.pc = 0
-        self.stackPointer = 8
+        self.sp = 7
         self.HALTED = False
     def load(self):
         """Load a program into memory."""
@@ -103,24 +136,26 @@ class CPU:
             operand_b = self.ram_read(self.pc + 2)
             # mask the remaining aspect of the code and then right shift
             # so it basically becomes the first value in IR * 2^1 + second value in IR*2^0
-            operands = (IR & 0b11000000) >> 6
-            if IR == HLT:
-                self.HALTED = True
-            elif IR == LDI:
-                self.reg[operand_a] = operand_b
-            elif IR == PRN:
-                print(self.reg[operand_a])
-            elif IR == MUL:
-                self.alu("MUL", operand_a, operand_b)
-            elif IR == PUSH:
-                self.stackPointer -=1
-                address = self.reg[self.stackPointer]
-                self.raw_write(address) = operand_a
-            elif IR == POP:
-                pass
-            else:
-                print(f"Unknown Instruction {IR:08b}")
-                sys.exit(1)
+            operands = (IR  >> 6 ) & 0b11000000
+            # if IR == HLT:
+            #     self.HALTED = True
+            # elif IR == LDI:
+            #     self.reg[operand_a] = operand_b
+            # elif IR == PRN:
+            #     print(self.reg[operand_a])
+            # elif IR == MUL:
+            #     self.alu("MUL", operand_a, operand_b)
+            # elif IR == PUSH:
+            #     self.reg[self.sp] -= 1
+            #     value = self.reg[operand_a]
+            #     address = self.reg[self.sp]
+            #     self.raw_write(address, value)
+            # elif IR == POP:
+            #     self.reg[operand_a] = self.ram_read(self.reg[self.sp])
+            #     self.reg[self.sp] += 1
+            # else:
+            #     print(f"Unknown Instruction {IR:08b}")
+            #     sys.exit(1)
             self.pc += operands + 1
             
     
